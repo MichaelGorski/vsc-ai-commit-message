@@ -1,71 +1,72 @@
-# ai-commit-message README
+# AI Commit Message Generator
 
-This is the README for your extension "ai-commit-message". After writing up a brief description, we recommend including the following sections.
+## Overview
+
+The AI Commit Message Generator is a Visual Studio Code extension that automatically generates commit messages for your Git repositories using artificial intelligence. This extension leverages the power of Anthropic's Claude AI to analyze your staged changes and create meaningful, context-aware commit messages.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Automatically generates commit messages when changes are staged in Git
+- Uses Anthropic's Claude AI for intelligent message generation
+- Seamlessly integrates with VS Code's source control features
+- Customizable through VS Code settings
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Visual Studio Code 1.60.0 or higher
+- Git installed and configured in your system
+- An Anthropic API key
 
-## Extension Settings
+## Installation
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1. Download the `.vsix` file from the latest release.
+2. Open Visual Studio Code.
+3. Go to the Extensions view (Ctrl+Shift+X or Cmd+Shift+X on Mac).
+4. Click on the "..." (More Actions) at the top of the Extensions view.
+5. Select "Install from VSIX...".
+6. Choose the downloaded `.vsix` file.
+7. Reload VS Code if prompted.
 
-For example:
+## Configuration
 
-This extension contributes the following settings:
+1. Open VS Code Settings (File > Preferences > Settings or Ctrl+,).
+2. Search for "AI Commit Message".
+3. Find the "Anthropic Api Key" field and enter your Anthropic API key.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Usage
 
-## Known Issues
+1. Open a Git repository in VS Code.
+2. Make changes to your files.
+3. Stage your changes using VS Code's Source Control view or Git commands.
+4. The extension will automatically generate a commit message based on your staged changes.
+5. Review the generated message in the Source Control input box.
+6. Modify the message if needed, or commit directly if you're satisfied.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+## How It Works
 
-## Release Notes
+The extension listens for changes in your Git repositories. When you stage changes, it uses the Anthropic API to analyze the diff and generate a contextual commit message. This message is then automatically inserted into the commit message input box in the Source Control view.
 
-Users appreciate release notes as you update your extension.
+## Troubleshooting
 
-### 1.0.0
+If you encounter any issues:
 
-Initial release of ...
+1. Check the Output panel (View > Output) and select "AI Commit Message" from the dropdown to see any error messages or logs.
+2. Ensure your Anthropic API key is correctly set in the VS Code settings.
+3. Make sure you have an active internet connection for the AI to function.
+4. If the extension seems unresponsive, try reloading the VS Code window (Ctrl+R or Cmd+R on Mac).
 
-### 1.0.1
+## Contributing
 
-Fixed issue #.
+Contributions to the AI Commit Message Generator are welcome! Please feel free to submit pull requests, create issues or spread the word.
 
-### 1.1.0
+## License
 
-Added features X, Y, and Z.
+[MIT License](LICENSE)
+
+## Disclaimer
+
+This extension sends diff information to Anthropic's API for processing. Please ensure you're comfortable with this and that it complies with your organization's policies before use.
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+For more information or to report issues, please visit the [GitHub repository](https://github.com/yourusername/ai-commit-message).
