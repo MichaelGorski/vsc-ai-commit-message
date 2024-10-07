@@ -47,5 +47,6 @@
 		"type": "git",
 		"url": "https://github.com/MichaelGorski/ai-commit-message.git"
 	},
-	"publisher": "Michael Sathya Gorski"
+	"publisher": "Michael Sathya Gorski",
+	"license": "MIT"
 }
