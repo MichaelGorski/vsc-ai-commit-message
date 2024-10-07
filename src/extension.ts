@@ -6,6 +6,7 @@ import Anthropic from "@anthropic-ai/sdk";
 const exec = util.promisify(cp.exec);
 
 export function activate(context: vscode.ExtensionContext): void {
+	console.log("AI Commit Message extension is now active!");
 	const gitExtension =
 		vscode.extensions.getExtension<GitExtension>("vscode.git")?.exports;
 	if (!gitExtension) {
@@ -15,13 +16,21 @@ export function activate(context: vscode.ExtensionContext): void {
 
 	const git = gitExtension.getAPI(1);
 
-	// biome-ignore lint/complexity/noForEach: <not needed with for Each>
-	git.repositories.forEach((repo) => {
-		repo.state.onDidChange(() => handleRepositoryStateChange(repo));
-	});
+	context.subscriptions.push(
+		git.onDidOpenRepository((repo) => {
+			const disposable = repo.state.onDidChange(() =>
+				handleRepositoryStateChange(repo),
+			);
+			context.subscriptions.push(disposable);
+		}),
+	);
 
-	git.onDidOpenRepository((repo) => {
-		repo.state.onDidChange(() => handleRepositoryStateChange(repo));
+	// biome-ignore lint/complexity/noForEach: <not needed for each>
+	git.repositories.forEach((repo) => {
+		const disposable = repo.state.onDidChange(() =>
+			handleRepositoryStateChange(repo),
+		);
+		context.subscriptions.push(disposable);
 	});
 }
 
@@ -34,16 +43,26 @@ async function handleRepositoryStateChange(repo: Repository): Promise<void> {
 			// Set the commit message in the Source Control input box
 			repo.inputBox.value = commitMessage;
 		} catch (error) {
-			vscode.window.showErrorMessage(
-				`Error generating commit message: ${error instanceof Error ? error.message : String(error)}`,
-			);
+			if (error instanceof Error && error.name === "Canceled") {
+				// Operation was canceled, likely due to the extension host restarting
+				console.log("Operation canceled:", error.message);
+			} else {
+				vscode.window.showErrorMessage(
+					`Error generating commit message: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
 		}
 	}
 }
 
 async function getDiff(repoPath: string): Promise<string> {
-	const { stdout } = await exec("git diff --cached", { cwd: repoPath });
-	return stdout;
+	try {
+		const { stdout } = await exec("git diff --cached", { cwd: repoPath });
+		return stdout;
+	} catch (error) {
+		console.error("Error getting diff:", error);
+		throw new Error("Failed to get Git diff");
+	}
 }
 
 async function generateCommitMessage(diff: string): Promise<string> {
@@ -62,18 +81,23 @@ async function generateCommitMessage(diff: string): Promise<string> {
 
 	const prompt = `Based on the following git diff, write a concise and informative commit message:\n\n${diff}\n\nCommit message:`;
 
-	const completion = await anthropic.completions.create({
-		model: "claude-2.1",
-		max_tokens_to_sample: 100,
-		prompt: `Human: ${prompt}\n\nAssistant:`,
-	});
+	try {
+		const completion = await anthropic.completions.create({
+			model: "claude-2.1",
+			max_tokens_to_sample: 100,
+			prompt: `Human: ${prompt}\n\nAssistant:`,
+		});
 
-	return completion.completion.trim();
+		return completion.completion.trim();
+	} catch (error) {
+		console.error("Error generating commit message:", error);
+		throw new Error("Failed to generate commit message");
+	}
 }
 
 export function deactivate(): void {}
 
-// Updated type definitions for the Git extension API
+// Type definitions for the Git extension API
 interface GitExtension {
 	getAPI(version: number): Git;
 }
@@ -81,7 +105,8 @@ interface GitExtension {
 interface Git {
 	repositories: Repository[];
 	onDidOpenRepository: (
-		listener: (repo: Repository) => void,
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		listener: (repo: Repository) => any,
 	) => vscode.Disposable;
 }
 
@@ -95,5 +120,6 @@ interface Repository {
 
 interface RepositoryState {
 	indexChanges: string[];
-	onDidChange: (listener: () => void) => vscode.Disposable;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	onDidChange: (listener: () => any) => vscode.Disposable;
 }
