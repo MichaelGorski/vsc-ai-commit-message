@@ -79,12 +79,48 @@ async function generateCommitMessage(diff: string): Promise<string> {
 		apiKey: apiKey,
 	});
 
-	const prompt = `Based on the following git diff, write a concise and informative commit message:\n\n${diff}\n\nCommit message:`;
+	const prompt = `Generate a concise and informative git commit message based on the following diff summary:
+
+${diff}
+
+Please follow these guidelines:
+1. Start with a brief (50 characters or less) summary of the change.
+2. Follow with a more detailed explanation, if necessary.
+3. Use the imperative mood in the subject line (e.g., "Add feature" not "Added feature").
+4. Mention any breaking changes.
+5. Reference relevant issue numbers if applicable.
+6. Explain the motivation for the change and how it differs from previous behavior.
+
+Format the message like this:
+
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+
+Where:
+- <type> is one of: feat, fix, docs, style, refactor, test, chore
+- <scope> is optional and represents the module affected
+- <subject> is a short summary
+- <body> provides detailed description (if needed)
+- <footer> contains any breaking changes or issue references
+
+Example types:
+- feat: A new feature
+- fix: A bug fix
+- docs: Documentation only changes
+- style: Changes that do not affect the meaning of the code (white-space, formatting, etc)
+- refactor: A code change that neither fixes a bug nor adds a feature
+- test: Adding missing tests or correcting existing tests
+- chore: Changes to the build process or auxiliary tools and libraries
+
+Commit message:`;
 
 	try {
 		const completion = await anthropic.completions.create({
-			model: "claude-2.1",
-			max_tokens_to_sample: 100,
+			model: "claude-3-5-sonnet-20240620",
+			max_tokens_to_sample: 400, // Increased to allow for longer messages
 			prompt: `Human: ${prompt}\n\nAssistant:`,
 		});
 
